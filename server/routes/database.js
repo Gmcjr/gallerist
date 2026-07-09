@@ -532,6 +532,8 @@ dbRouter.post('/db/stealArt/:_id', (req, res) => {
     });
 });
 
+// routes for the Black Market Tab
+
 // POST- a new Black Market listing should be posted whenever art is sold to the Black Market
 dbRouter.post('/db/blackmarket/sell/:_id', (req, res) => {
   const { _id } = req.params;
@@ -546,6 +548,49 @@ dbRouter.post('/db/blackmarket/sell/:_id', (req, res) => {
     })
     .catch((err) => {
       console.error('Failed to sell to Black Market', err);
+      res.sendStatus(500);
+    });
+});
+
+// GET route that allows for the black market listings to be viewed
+dbRouter.get('/db/blackmarket', (req, res) => {
+  BlackMarketArt.aggregate([
+    // $match: filters the documents to only include those 'active'
+    { $match: { status: 'active' } },
+    // $sample: randomly picks a specific number of documents (3, in this case)
+    { $sample: { size: 3 } },
+    {
+      // $lookup: performs a "join" with arts collection. finds full art details
+      $lookup: {
+        from: 'arts',
+        localField: 'artwork',
+        foreignField: '_id',
+        as: 'artworkDetails',
+      }
+    },
+    // $unwind: flattens that array into a single object
+    { $unwind: '$artworkDetails' }
+  ])
+    .then((listings) => res.status(200).send(listings))
+    .catch((err) => {
+      console.error('Failed to retrieve Black Market Art listings', err);
+      res.sendStatus(500);
+    });
+});
+
+// PATCH route that updates a user's voucher number when they use or obtain a voucher
+dbRouter.patch('/db/blackmarket/voucher', (req, res) => {
+  const userId = req.user.doc._id;
+
+  User.findById(userId)
+    .then((user) => {
+      if (user.vouchers < 1) return res.sendStatus(400);
+
+      return User.findByIdAndUpdate(userId, { $inc: { vouchers: -1, wallet: 1000 } }, { new: true })
+        .then((updatedUser) => res.status(200).send(updatedUser));
+    })
+    .catch((err) => {
+      console.error('Failed to redeem voucher', err);
       res.sendStatus(500);
     });
 });
