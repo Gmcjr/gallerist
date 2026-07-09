@@ -10,7 +10,7 @@ const { authRouter } = require('./routes/auth');
 const { apiRouter } = require('./routes/api');
 const { dbRouter } = require('./routes/database');
 const { MemeRouter } = require('./routes/meme/Meme');
-const { showcaseRouter } = require('/routes/showcase/Showcase');
+const { showcaseRouter } = require('./routes/showcase/Showcase');
 const { quizRouter } = require('./routes/quizDBrouter');
 
 require('dotenv').config();
