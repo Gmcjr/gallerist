@@ -10,7 +10,9 @@ const { authRouter } = require('./routes/auth');
 const { apiRouter } = require('./routes/api');
 const { dbRouter } = require('./routes/database');
 const { MemeRouter } = require('./routes/meme/Meme');
+const { showcaseRouter } = require('./routes/showcase/Showcase');
 const { quizRouter } = require('./routes/quizDBrouter');
+const { userArtRouter } = require('./routes/userArtDBRouter');
 const blackMarketRouter = require('./routes/blackMarket');
 
 require('dotenv').config();
@@ -33,6 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static(path.resolve(__dirname, '../client/dist')));
+app.use('/audio', express.static(path.resolve(__dirname, 'public/audio')));
 
 app.use(
   session({
@@ -60,8 +63,14 @@ app.use('/', dbRouter);
 // meme Routes
 app.use('/meme', MemeRouter);
 
+// showcase Routes
+app.use('/showcase', showcaseRouter);
+
 // Quiz DB Routes
 app.use('/', quizRouter);
+
+// Drawing DB Routes
+app.use('/', userArtRouter);
 
 // Black Market routes
 app.use('/db/blackmarket', blackMarketRouter);

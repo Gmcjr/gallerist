@@ -3,6 +3,7 @@ const findOrCreate = require('mongoose-findorcreate');
 require('dotenv').config();
 
 const { Schema, model } = mongoose;
+// eslint-disable-next-line camelcase
 const db_uri = process.env.DB_URI;
 
 mongoose
@@ -48,7 +49,7 @@ const ArtSchema = new Schema({
     type: Number,
     default: 0,
   },
-});
+}, { timestamps: true });
 
 const MemeSchema = new Schema({
   title: String,
@@ -92,6 +93,7 @@ const VaultSchema = new Schema({
   }],
 });
 
+// eslint-disable-next-line camelcase
 const AIC_Schema = new Schema({
   id: { type: Number, required: true },
   image_id: { type: String, required: true },
@@ -117,13 +119,38 @@ const WatchedSchema = new Schema({
   isWatched: Boolean,
 });
 
+const UserArtSchema = new Schema({
+  imageUrl: {
+    type: String,
+    required: true,
+  },
+  posted: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+UserArtSchema.virtual('id').get(() => this.imageId ?? this._id);
+UserArtSchema.set('toJSON', { virtuals: true });
+
 const BlackMarketArtSchema = new Schema({
+  itemType: { type: String, enum: ['painting', 'voucher'], default: 'painting' },
+  title: { type: String },
+  artist: { type: String },
+  date: { type: String },
+  culture: { type: String },
+  imageId: { type: String, unique: true },
+  url: { type: String },
+  imageUrl: { type: String },
+  isforsale: { type: Boolean, default: false },
+  price: { type: Number, default: 0 },
+  ownerId: { type: String, default: 'black_market' },
+  haggleCount: { type: Number, default: 0 },
+  voucherValue: { type: Number, default: 0 },
   artwork: {
     type: Schema.Types.ObjectId,
-    ref: 'Artwork',
+    ref: 'Art',
   },
-  price: { type: Number, default: 5000 },
-  status: { type: String, default: 'active' },
 });
 
 const User = model('User', UserSchema);
@@ -133,8 +160,9 @@ const Showcase = model('Showcase', ShowcaseSchema);
 const Vault = model('Vault', VaultSchema);
 const AICart = model('AICart', AIC_Schema);
 const Watch = model('Watch', WatchedSchema);
+const UserArt = Art.discriminator('UserArt', UserArtSchema);
 const BlackMarketArt = model('BlackMarketArt', BlackMarketArtSchema);
 
 module.exports = {
-  User, Art, Meme, Showcase, Vault, AICart, Watch, BlackMarketArt,
+  User, Art, Meme, Vault, AICart, Watch, UserArt, BlackMarketArt, Showcase,
 };

@@ -34,11 +34,17 @@ function NavBar() {
             <Nav.Link as={NavLink} eventKey="auction" to="auction">
               Auction
             </Nav.Link>
+            <Nav.Link as={NavLink} eventKey="showcase" to="showcase">
+              Showcase
+            </Nav.Link>
             <Nav.Link as={NavLink} eventKey="heist" to="heist">
               Heist
             </Nav.Link>
             <Nav.Link as={NavLink} eventKey="quiz" to="quiz">
               Quiz
+            </Nav.Link>
+            <Nav.Link as={NavLink} eventKey="canvas" to="canvas">
+              Canvas
             </Nav.Link>
             <form action="/logout" method="post">
               <Button variant="secondary" type="submit">
