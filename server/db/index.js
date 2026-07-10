@@ -36,7 +36,7 @@ const ArtSchema = new Schema({
   userGallery: Object,
   isForSale: Boolean,
   price: Number,
-});
+}, { timestamps: true });
 
 const MemeSchema = new Schema({
   title: String,
@@ -96,7 +96,7 @@ const UserArtSchema = new Schema({
     type: Boolean,
     default: false,
   },
-}, { timestamps: true });
+});
 
 UserArtSchema.virtual('id').get(() => this.imageId ?? this._id);
 UserArtSchema.set('toJSON', { virtuals: true });

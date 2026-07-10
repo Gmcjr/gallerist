@@ -66,3 +66,5 @@ userArtRouter.get('/db/drawings/:id', (req, res) => {
       res.sendStatus(500);
     });
 });
+
+module.exports = { userArtRouter };

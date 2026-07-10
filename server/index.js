@@ -11,6 +11,7 @@ const { apiRouter } = require('./routes/api');
 const { dbRouter } = require('./routes/database');
 const { MemeRouter } = require('./routes/meme/Meme');
 const { quizRouter } = require('./routes/quizDBrouter');
+const { userArtRouter } = require('./routes/userArtDBRouter');
 
 require('dotenv').config();
 
@@ -61,6 +62,9 @@ app.use('/meme', MemeRouter);
 
 // Quiz DB Routes
 app.use('/', quizRouter);
+
+// Drawing DB Routes
+app.use('/', userArtRouter);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
