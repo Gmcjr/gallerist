@@ -1,13 +1,17 @@
+import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 
 function Canvas() {
   const paintCanvasRef = useRef(null);
   const isPainting = useRef(false);
+  const undoHistory = useRef([]);
+  const redoHistory = useRef([]);
   const [brushSize, setBrushSize] = useState(15);
   const [color, setColor] = useState('#000000');
   const [tool, setTool] = useState('brush');
-  const undoHistory = useRef([]);
-  const redoHistory = useRef([]);
+  const [title, setTitle] = useState('');
+  const [drawings, setDrawings] = useState([]);
+  const [currentDrawing, setCurrentDrawing] = useState(null);
 
   useEffect(() => {
     function handleShortcut(e) {
@@ -19,6 +23,12 @@ function Canvas() {
         e.preventDefault();
         moveHistory(false);
       }
+      if (e.key === 'b') {
+        setTool('brush');
+      }
+      if (e.key === 'e') {
+        setTool('eraser');
+      }
     }
 
     window.addEventListener('keydown', handleShortcut);
@@ -26,6 +36,12 @@ function Canvas() {
     return () => {
       window.removeEventListener('keydown', handleShortcut);
     };
+  }, []);
+
+  useEffect(() => {
+    axios.get('/db/drawings')
+      .then((res) => setDrawings(res.data))
+      .catch((err) => console.error('Could not fetch drawings: ', err));
   }, []);
 
   function startStroke(e) {
@@ -77,6 +93,46 @@ function Canvas() {
     img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   }
 
+  function saveDrawing(e) {
+    e.preventDefault();
+    const canvas = paintCanvasRef.current;
+    const imageUrl = canvas.toDataURL();
+    if (!currentDrawing) {
+      axios.post('/db/drawings', {
+        art: {
+          imageUrl,
+          isForSale: false,
+          title,
+        },
+      })
+        .then(() => console.log('Saved'))
+        .catch((err) => console.error('Save failed: ', err));
+    } else {
+      axios.put(`/db/drawings/${currentDrawing.id}`, {
+        art: {
+          ...currentDrawing,
+          imageUrl,
+        },
+      })
+        .then(() => console.log('Drawing updated successfully'))
+        .catch((err) => console.log('Save failed: ', err));
+    }
+  }
+
+  function loadDrawing(id) {
+    const drawing = drawings.find((d) => d.id === id);
+    const canvas = paintCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let img = null;
+    if (drawing) {
+      setCurrentDrawing(drawing);
+      img = new Image();
+      img.src = drawing.imageUrl;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    img.onload = () => ctx.drawImage(img || , 0, 0, canvas.width, canvas.height);
+  }
+
   return (
     <div>
       <div>
@@ -122,17 +178,17 @@ function Canvas() {
           type="button"
           onClick={() => moveHistory(true)}
         >
-          U
+          ctrl + z
         </button>
         <h2>Redo</h2>
         <button
           type="button"
           onClick={() => moveHistory(false)}
         >
-          R
+          ctrl + x
         </button>
       </div>
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', width: '400px', height: '600px' }}>
         <canvas
           ref={paintCanvasRef}
           style={{
@@ -148,6 +204,21 @@ function Canvas() {
           onMouseUp={stopStroke}
         />
       </div>
+      <form onSubmit={saveDrawing}>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title your Drawing"
+        />
+        <button type="submit">Save Drawing</button>
+      </form>
+      <select onChange={(e) => loadDrawing(e.target.value)}>
+        <option value="" key="newDrawing">New Drawing</option>
+        {drawings.map((d) => (
+          <option value={d.id} key={d.id}>{d.title}</option>
+        ))}
+      </select>
     </div>
   );
 }

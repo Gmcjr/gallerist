@@ -34,6 +34,7 @@ const ArtSchema = new Schema({
   imageId: {
     type: Number,
     unique: true,
+    sparse: true,
   },
   url: String,
   imageUrl: String,
@@ -120,7 +121,9 @@ const UserArtSchema = new Schema({
   },
 });
 
-UserArtSchema.virtual('id').get(() => this.imageId ?? this._id);
+UserArtSchema.virtual('id').get(function () {
+  return this.imageId ?? this._id;
+});
 UserArtSchema.set('toJSON', { virtuals: true });
 
 const BlackMarketArtSchema = new Schema({

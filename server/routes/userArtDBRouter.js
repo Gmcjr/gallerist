@@ -67,4 +67,22 @@ userArtRouter.get('/db/drawings/:id', (req, res) => {
     });
 });
 
+userArtRouter.delete('/db/drawings/:id', (req, res) => {
+  const { googleId } = req.user.doc;
+
+  UserArt.findById(req.params.id)
+    .then((doc) => {
+      if (!doc) return res.sendStatus(404);
+      if (doc.userGallery.googleId !== googleId) return res.sendStatus(403);
+      if (doc.isForSale) return res.sendStatus(409);
+
+      return doc.deleteOne()
+        .then(() => res.sendStatus(200));
+    })
+    .catch((err) => {
+      console.error('Failed to delete user created art document: ', err);
+      res.sendStatus(500);
+    });
+});
+
 module.exports = { userArtRouter };
