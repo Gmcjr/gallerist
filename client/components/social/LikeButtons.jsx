@@ -11,7 +11,7 @@ function LikeButtons({ id, getAllImages }) {
     };
 
     axios
-      .patch(`/db/art/${id}`, updObj)
+      .patch(`/social/likes/art/${id}`, updObj)
       .then(getAllImages)
       .catch((err) => {
         console.error('Error patching art in database!:', err);
