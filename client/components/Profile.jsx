@@ -61,11 +61,11 @@ function Profile() {
 
   // State for price setting feature
   const [price, setPrice] = useState(0);
-  const [imageId, setImageId] = useState(0);
+  const [id, setId] = useState(0);
 
-  function putSale(id) {
+  function putSale(_id) {
     axios
-      .put(`/db/art/${id}`, {
+      .put(`/db/art/${_id}`, {
         isForSale: true,
         price,
       })
@@ -197,7 +197,7 @@ function Profile() {
                     <Row>
                       <Col sm="10">
                         <Row>
-                          <Link to={`/home/art/${art.imageId}`}>
+                          <Link to={`/home/art/${art._id}`}>
                             <strong>{art.title}</strong>
                           </Link>
                         </Row>
@@ -207,10 +207,10 @@ function Profile() {
                         <Button
                           variant="outline-success"
                           type="button"
-                          value={art.imageId}
+                          value={art._id}
                           // onClick={putSale}
                           onClick={(e) => {
-                            setImageId(e.target.value);
+                            setId(e.target.value);
                             showPriceModal();
                           }}
                         >
@@ -221,7 +221,7 @@ function Profile() {
                         <Button
                           variant="outline"
                           type="button"
-                          value={art.imageId}
+                          value={art._id}
                           onClick={deleteArt}
                         >
                           ❌
@@ -246,7 +246,7 @@ function Profile() {
                     <Row>
                       <Col sm="10">
                         <Row>
-                          <Link to={`/home/art/${art.imageId}`}>
+                          <Link to={`/home/art/${art._id}`}>
                             <strong>{art.title}</strong>
                           </Link>
                         </Row>
@@ -256,7 +256,7 @@ function Profile() {
                         <Button
                           variant="outline-warning"
                           type="button"
-                          value={art.imageId}
+                          value={art._id}
                           onClick={unlistSale}
                         >
                           Unlist
@@ -266,7 +266,7 @@ function Profile() {
                         <Button
                           variant="outline"
                           type="button"
-                          value={art.imageId}
+                          value={art._id}
                           onClick={deleteArt}
                         >
                           ❌
@@ -349,7 +349,7 @@ function Profile() {
             variant="primary"
             type="submit"
             onClick={() => {
-              putSale(imageId);
+              putSale(id);
               closePriceModal();
             }}
           >

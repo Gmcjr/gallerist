@@ -31,13 +31,13 @@ function GalleryListItem({ image, users, getAllImages }) {
   return (
     <Container fluid>
       <Row>
-        <Col className="gallery-item" key={image.imageId}>
+        <Col className="gallery-item" key={image._id}>
           <div>
             <Image
               className="gallery-image"
               style={{ width: '250px', height: 'auto' }}
               src={image.imageUrl}
-              id={image.imageId}
+              id={image._id}
               alt={image.title}
             />
             <br />
@@ -59,7 +59,7 @@ function GalleryListItem({ image, users, getAllImages }) {
             </div>
             )}
           </div>
-          <Link to={`/home/art/${image.imageId}`}>Click here for more details...</Link>
+          <Link to={`/home/art/${image._id}`}>Click here for more details...</Link>
           <br />
           Likes:
           { image.likes }

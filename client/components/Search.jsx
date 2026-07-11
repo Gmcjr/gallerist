@@ -31,12 +31,11 @@ function Search() {
     axios.post('/db/art', {
       art: {
         title: artObj.title,
-        artist: artObj.people[0].displayname,
+        artist: artObj.people?.[0].displayname || 'unknown',
         date: artObj.dated,
         culture: artObj.culture,
-        imageId: artObj.id,
         url: artObj.url,
-        imageUrl: artObj.images[0].baseimageurl,
+        imageUrl: artObj.images[0]?.baseimageurl || artObj.primaryimageurl,
         isForSale: false,
         price: 0,
       },
@@ -73,7 +72,7 @@ function Search() {
   function idSearch(id) {
     axios(`/huam/object/${id}`)
       .then(({ data }) => {
-        // console.log(data);
+        console.log(data);
         if (data[0].images.length === 0) {
           setMessage('Sorry this piece is no longer available');
           handleShow();

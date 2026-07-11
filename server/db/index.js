@@ -32,11 +32,6 @@ const ArtSchema = new Schema({
   artist: String,
   date: String,
   culture: String,
-  imageId: {
-    type: Number,
-    unique: true,
-    sparse: true,
-  },
   url: String,
   imageUrl: String,
   userGallery: Object,

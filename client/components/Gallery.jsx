@@ -168,7 +168,7 @@ function Gallery() {
       </Row>
       <Row>
         {meme === false && images.filter(Boolean).map((image, i) => (
-          <Col key={`${image.imageId}-${i}`}>
+          <Col key={`${image._id}-${i}`}>
             <GalleryListItem
               image={image}
               getAllImages={getAllImages}
