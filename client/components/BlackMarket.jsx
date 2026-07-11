@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-one-expression-per-line */
 /* eslint-disable no-alert */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -14,6 +15,7 @@ function BlackMarket() {
   const [hagglesMade, setHagglesMade] = useState(0);
   const [showSellModal, setShowSellModal] = useState(false);
   const [userInventory, setUserInventory] = useState([]);
+  const [haggleStatus, setHaggleStatus] = useState(''); // Status text
 
   const fetchData = () => {
     axios.get('/db/user/')
@@ -42,10 +44,7 @@ function BlackMarket() {
         setHagglesMade(0);
         fetchData();
       })
-      .catch((err) => {
-        console.error(err);
-        alert('Purchase failed.');
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleOpenSellModal = () => {
@@ -62,7 +61,6 @@ function BlackMarket() {
       .then(() => {
         setShowSellModal(false);
         fetchData();
-        alert('Art sold to the Black Market!');
       })
       .catch((err) => console.error('Failed to sell art', err));
   };
@@ -82,9 +80,12 @@ function BlackMarket() {
       .then((res) => {
         setListings(res.data.listings);
         setHagglesMade((prev) => prev + 1);
-        alert(res.data.success ? 'Haggle successful!' : 'Haggle failed!');
+        setHaggleStatus(res.data.success ? ' (Success!)' : ' (Failed!)');
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setHaggleStatus(' (Error)');
+      });
   };
 
   return (
@@ -119,7 +120,6 @@ function BlackMarket() {
                     src={item.imageUrl || item.url || 'https://via.placeholder.com/250'}
                     alt={item.title || 'Market Item'}
                     onError={(e) => {
-                      console.error('Image failed to load:', e.target.src);
                       e.target.src = 'https://via.placeholder.com/250';
                     }}
                     style={{
@@ -133,14 +133,12 @@ function BlackMarket() {
                 <Button
                   variant="info"
                   className="w-100 fw-bold rounded"
-                  style={
-                    {
-                      backgroundColor: '#00d2ff',
-                      color: '#000',
-                      border: 'none',
-                      padding: '10px',
-                    }
-                  }
+                  style={{
+                    backgroundColor: '#00d2ff',
+                    color: '#000',
+                    border: 'none',
+                    padding: '10px',
+                  }}
                   onClick={() => handleBuy(item._id)}
                 >
                   BUY FOR: $
@@ -155,9 +153,7 @@ function BlackMarket() {
       <Row className="text-center mt-5">
         <Col md={4}>
           <p className="fw-bold mb-2">
-            vouchers owned: [
-            {vouchers}
-            ]
+            vouchers owned: {vouchers}
           </p>
           <Button variant="dark" className="border border-info rounded px-4" onClick={handleRedeemVoucher}>Redeem Voucher</Button>
         </Col>
@@ -166,9 +162,7 @@ function BlackMarket() {
         </Col>
         <Col md={4}>
           <p className="fw-bold mb-2">
-            haggles made: [
-            {hagglesMade}
-            ]
+            haggles made: {hagglesMade} {haggleStatus}
           </p>
           <Button variant="dark" className="border border-info rounded px-4" onClick={handleAttemptHaggle}>Attempt Haggle</Button>
         </Col>

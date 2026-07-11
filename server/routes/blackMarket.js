@@ -10,7 +10,7 @@ const {
 } = require('../db/index');
 
 // POST- a new Black Market listing should be posted whenever art is sold to the Black Market
-blackMarketRouter.post('/sell/:_id', (req, res) => {
+blackMarketRouter.post('/db/blackmarket/sell/:_id', (req, res) => {
   const { _id } = req.params;
   const userId = req.user.doc._id;
 
@@ -41,7 +41,7 @@ blackMarketRouter.post('/sell/:_id', (req, res) => {
 });
 
 // GET route that allows for the black market paintings and vouchers to be viewed
-blackMarketRouter.get('/', (req, res) => {
+blackMarketRouter.get('/db/blackmarket', (req, res) => {
   BlackMarketArt.find({ ownerId: 'black_market' })
     .then((listings) => {
       const shuffled = listings.sort(() => 0.5 - Math.random());
@@ -56,7 +56,7 @@ blackMarketRouter.get('/', (req, res) => {
 });
 
 // PATCH route that updates a user's voucher number when they use it
-blackMarketRouter.patch('/voucher/:itemId', (req, res) => {
+blackMarketRouter.patch('/db/blackmarket/voucher/:itemId', (req, res) => {
   const { itemId } = req.params;
   const userId = req.user.doc._id;
 
@@ -78,7 +78,7 @@ blackMarketRouter.patch('/voucher/:itemId', (req, res) => {
 
 // PATCH route that allows a user to haggle
 // after each haggle the price will increase or decrease depending on success or fail
-blackMarketRouter.patch('/haggle', (req, res) => {
+blackMarketRouter.patch('/db/blackmarket/haggle', (req, res) => {
   const { listingIds } = req.body;
 
   if (!listingIds || !listingIds.length) {
@@ -125,7 +125,7 @@ blackMarketRouter.patch('/haggle', (req, res) => {
 });
 
 // DELETE: Purchase an artwork and remove it from the Black Market
-blackMarketRouter.delete('/buy/:_id', (req, res) => {
+blackMarketRouter.delete('/db/blackmarket/buy/:_id', (req, res) => {
   const { _id } = req.params;
   const userId = req.user.doc._id;
   const { name, googleId } = req.user.doc;

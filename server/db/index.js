@@ -136,27 +136,6 @@ UserArtSchema.virtual('id').get(function () {
 });
 UserArtSchema.set('toJSON', { virtuals: true });
 
-const BlackMarketArtSchema = new Schema({
-  itemType: { type: String, enum: ['painting', 'voucher'], default: 'painting' },
-  title: { type: String },
-  artist: { type: String },
-  date: { type: String },
-  culture: { type: String },
-  imageId: { type: String, unique: true },
-  url: { type: String },
-  imageUrl: { type: String },
-  isforsale: { type: Boolean, default: false },
-  price: { type: Number, default: 0 },
-  ownerId: { type: String, default: 'black_market' },
-  haggleCount: { type: Number, default: 0 },
-  voucherValue: { type: Number, default: 0 },
-  artwork: {
-    type: Schema.Types.ObjectId,
-    ref: 'Art',
-    sparse: true,
-  },
-});
-
 const User = model('User', UserSchema);
 const Art = model('Art', ArtSchema);
 const Meme = model('Meme', MemeSchema);
@@ -165,7 +144,14 @@ const Vault = model('Vault', VaultSchema);
 const AICart = model('AICart', AIC_Schema);
 const Watch = model('Watch', WatchedSchema);
 const UserArt = Art.discriminator('UserArt', UserArtSchema);
-const BlackMarketArt = model('BlackMarketArt', BlackMarketArtSchema);
+
+const BlackMarketArt = Art.discriminator('BlackMarket', new Schema({
+  itemType: { type: String, enum: ['painting', 'voucher'], default: 'painting' },
+  ownerId: { type: String, default: 'black_market' },
+  haggleCount: { type: Number, default: 0 },
+  voucherValue: { type: Number, default: 0 },
+  artwork: { type: Schema.Types.ObjectId, ref: 'Art', sparse: true },
+}));
 
 module.exports = {
   User, Art, Meme, Vault, AICart, Watch, UserArt, BlackMarketArt, Showcase,

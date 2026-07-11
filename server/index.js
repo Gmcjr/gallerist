@@ -74,7 +74,7 @@ app.use('/', quizRouter);
 app.use('/', userArtRouter);
 
 // Black Market routes
-app.use('/db/blackmarket', blackMarketRouter);
+app.use('/', blackMarketRouter);
 
 // Social Routes
 app.use('/social', socialRouter);
