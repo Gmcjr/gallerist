@@ -189,7 +189,8 @@ dbRouter.put('/db/art/:_id', (req, res) => {
       }
     })
     .catch((err) => {
-      console.error('Failed to Update art by id: ', err);
+      console.error('Failed to Update art by imageId: ', err);
+      res.sendStatus(500);
     });
 });
 
