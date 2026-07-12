@@ -6,8 +6,12 @@ const showcaseRouter = express.Router();
 const { Showcase } = require('../../db/index');
 
 // READ: all published showcases, for the public browse list (drafts stay hidden)
+// Expired showxases drop off but remain visible via the curator's own PalGallery page
 showcaseRouter.get('/get', (req, res) => {
-  Showcase.find({ isDraft: false })
+  Showcase.find({
+    isDraft: false,
+    $or: [{ endDate: null }, { endDate: { $gte: new Date() } }],
+  })
     .then((showcases) => {
       res.status(200).send(showcases);
     })
@@ -36,6 +40,20 @@ showcaseRouter.get('/get/:id', (req, res) => {
     .catch((err) => {
       console.error('Showcase find by id: Failed ', err);
       res.sendStatus(500);
+    });
+});
+
+// READ: all published showcases by a specific curator, for their public PalGallery page
+// This never filters by endDate, so a curator's own page keeps
+// every showcase they've published, even after it expires and drops off the main Showcase list
+showcaseRouter.get('/curator/:curatorName', (req, res) => {
+  const { curatorName } = req.params;
+  Showcase.find({ curatorName, isDraft: false })
+    .then((showcases) => {
+      res.status(200).send(showcases);
+    })
+    .catch((err) => {
+      console.error('Showcase find by curator: Failed ', err);
     });
 });
 
