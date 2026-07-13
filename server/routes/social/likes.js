@@ -14,7 +14,7 @@ likesRouter.patch('/art/:imageId', (req, res) => {
   const { likeInfo } = req.body; // { likes: 1/0/-1, dislikes: 1/0/-1 }
 
   Art
-    .findOne({ imageId })
+    .findById(imageId)
     .then((art) => {
       if (art) {
         Art
@@ -23,7 +23,7 @@ likesRouter.patch('/art/:imageId', (req, res) => {
             {
               likes: art.likes + likeInfo.likes,
               dislikes: art.dislikes + likeInfo.dislikes,
-            }
+            },
           )
           .then(() => res.sendStatus(200));
       } else {
