@@ -7,7 +7,6 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import ListGroup from 'react-bootstrap/ListGroup';
 import Card from 'react-bootstrap/Card';
 
 // eslint-disable-next-line import/no-unresolved
@@ -75,23 +74,19 @@ function ShowcaseSetup() {
       : [...prev, artId]));
   }
 
-  function addAllTracks() {
-    setPlaylist((prev) => {
-      const remaining = TRACKS.map((t) => t.value).filter(
-        (v) => !prev.includes(v),
-      );
-      return [...prev, ...remaining];
-    });
-  }
-
-  function clearPlaylist() {
-    setPlaylist([]);
+  function toggleAllArt() {
+    setArtPieces((prev) => (prev.length === myArt.length
+      ? [] : myArt.map((art) => art._id)));
   }
 
   function togglePlaylistTrack(value) {
     setPlaylist((prev) => (prev.includes(value)
       ? prev.filter((v) => v !== value)
       : [...prev, value]));
+  }
+
+  function toggleAllTracks() {
+    setPlaylist((prev) => (prev.length === TRACKS.length ? [] : TRACKS.map((t) => t.value)));
   }
 
   function moveTrack(index, direction) {
@@ -102,10 +97,6 @@ function ShowcaseSetup() {
       [next[index], next[target]] = [next[target], next[index]];
       return next;
     });
-  }
-
-  function removeTrack(value) {
-    setPlaylist((prev) => prev.filter((v) => v !== value));
   }
 
   function handleSave(isDraft) {
@@ -185,82 +176,63 @@ function ShowcaseSetup() {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Available Tracks</Form.Label>
-              <ListGroup className="mb-2">
-                {TRACKS.filter((track) => !playlist.includes(track.value)).map((track) => (
-                  <ListGroup.Item
-                    key={track.value}
-                    action
-                    onClick={() => togglePlaylistTrack(track.value)}
-                  >
-                    {track.label}
-                  </ListGroup.Item>
-                ))}
-                {TRACKS.every((track) => playlist.includes(track.value)) && (
-                <ListGroup.Item className="text-muted">
-                  All tracks are in your playlist.
-                </ListGroup.Item>
-                )}
-              </ListGroup>
-              <Button
-                variant="outline-secondary"
-                size="sm"
-                disabled={playlist.length === TRACKS.length}
-                onClick={addAllTracks}
-              >
-                Add All
-              </Button>
-            </Form.Group>
-
-            {playlist.length > 0 && (
-              <Form.Group className="mb-3">
-                <Form.Label>Playback Order</Form.Label>
-                <ListGroup>
+              <Form.Label>Tracks</Form.Label>
+              <Form.Check
+                type="checkbox"
+                label="Select All"
+                className="mb-2 fw-bold"
+                checked={TRACKS.length > 0 && playlist.length === TRACKS.length}
+                onChange={toggleAllTracks}
+              />
+              <Row>
+                <Col md={6}>
+                  <Form.Label className="small text-muted">Available</Form.Label>
+                  {TRACKS.filter((track) => !playlist.includes(track.value)).map((track) => (
+                    <Form.Check
+                      key={track.value}
+                      type="checkbox"
+                      label={track.label}
+                      checked={false}
+                      onChange={() => togglePlaylistTrack(track.value)}
+                    />
+                  ))}
+                </Col>
+                <Col md={6}>
+                  <Form.Label className="small text-muted">Playlist (Playback Order)</Form.Label>
                   {playlist.map((value, index) => {
                     const track = TRACKS.find((t) => t.value === value);
                     return (
-                      <ListGroup.Item
-                        key={value}
-                        className="d-flex justify-content-between align-items-center"
-                      >
-                        <span>{`${index + 1}. ${track ? track.label : value}`}</span>
-                        <div>
-                          <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            className="me-1"
-                            disabled={index === 0}
-                            onClick={() => moveTrack(index, -1)}
-                          >
-                            {'\u2191'}
-                          </Button>
-                          <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            className="me-1"
-                            disabled={index === playlist.length - 1}
-                            onClick={() => moveTrack(index, 1)}
-                          >
-                            {'\u2193'}
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => removeTrack(value)}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      </ListGroup.Item>
+                      <div key={value} className="d-flex align-items-center mb-1">
+                        <Form.Check
+                          type="checkbox"
+                          label={track ? track.label : value}
+                          checked
+                          onChange={() => togglePlaylistTrack(value)}
+                          className="flex-grow-1"
+                        />
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          className="me-1"
+                          disabled={index === 0}
+                          onClick={() => moveTrack(index, -1)}
+                        >
+                          {'\u2191'}
+                        </Button>
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          disabled={index === playlist.length - 1}
+                          onClick={() => moveTrack(index, 1)}
+                        >
+                          {'\u2193'}
+                        </Button>
+                      </div>
                     );
                   })}
-                </ListGroup>
-                <Button variant="outline-danger" size="sm" className="mt-2" onClick={clearPlaylist}>
-                  Remove All
-                </Button>
-              </Form.Group>
-            )}
-
+                </Col>
+              </Row>
+            </Form.Group>
             <Form.Group className="mb-3">
               <Form.Check
                 type="switch"
@@ -312,6 +284,13 @@ function ShowcaseSetup() {
 
             <Form.Group className="mb-3">
               <Form.Label>Choose Art From Your Gallery</Form.Label>
+              <Form.Check
+                type="checkbox"
+                label="Select All"
+                className="mb-2 fw-bold"
+                checked={myArt.length > 0 && artPieces.length === myArt.length}
+                onChange={toggleAllArt}
+              />
               {myArt.map((art) => (
                 <Form.Check
                   key={art._id}
