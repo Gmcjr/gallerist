@@ -109,7 +109,7 @@ showcaseRouter.post('/create', (req, res) => {
   const { _id, name } = req.user.doc;
   const {
     title,
-    message,
+    description,
     playlist,
     shuffle,
     artPieces,
@@ -140,7 +140,7 @@ showcaseRouter.post('/create', (req, res) => {
       curator: _id,
       curatorName: name,
       title,
-      message,
+      description,
       playlist,
       shuffle,
       artPieces,
@@ -173,7 +173,7 @@ showcaseRouter.post('/create', (req, res) => {
     curator: _id,
     curatorName: name,
     title,
-    message,
+    description,
     playlist,
     shuffle,
     artPieces,

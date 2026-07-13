@@ -21,7 +21,7 @@ function ShowcaseSetup() {
   const [editingId, setEditingId] = useState(null);
 
   const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
+  const [description, setdescription] = useState('');
   const [playlist, setPlaylist] = useState([]);
   const [shuffle, setShuffle] = useState(false);
   const [startDate, setStartDate] = useState('');
@@ -33,7 +33,7 @@ function ShowcaseSetup() {
   function loadForEdit(showcase) {
     setEditingId(showcase._id);
     setTitle(showcase.title || '');
-    setMessage(showcase.message || '');
+    setdescription(showcase.description || '');
     setPlaylist(showcase.playlist || []);
     setShuffle(!!showcase.shuffle);
     setStartDate(showcase.startDate ? showcase.startDate.slice(0, 10) : '');
@@ -60,7 +60,7 @@ function ShowcaseSetup() {
   function resetForm() {
     setEditingId(null);
     setTitle('');
-    setMessage('');
+    setdescription('');
     setPlaylist([]);
     setShuffle(false);
     setStartDate('');
@@ -73,6 +73,19 @@ function ShowcaseSetup() {
     setArtPieces((prev) => (prev.includes(artId)
       ? prev.filter((id) => id !== artId)
       : [...prev, artId]));
+  }
+
+  function addAllTracks() {
+    setPlaylist((prev) => {
+      const remaining = TRACKS.map((t) => t.value).filter(
+        (v) => !prev.includes(v),
+      );
+      return [...prev, ...remaining];
+    });
+  }
+
+  function clearPlaylist() {
+    setPlaylist([]);
   }
 
   function togglePlaylistTrack(value) {
@@ -99,7 +112,7 @@ function ShowcaseSetup() {
     setSaveError('');
     const payload = {
       title,
-      message,
+      description,
       playlist,
       shuffle,
       startDate,
@@ -163,25 +176,40 @@ function ShowcaseSetup() {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Message</Form.Label>
+              <Form.Label>Description</Form.Label>
               <Form.Control
                 as="textarea"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                value={description}
+                onChange={(e) => setdescription(e.target.value)}
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Add Tracks</Form.Label>
-              {TRACKS.map((track) => (
-                <Form.Check
-                  key={track.value}
-                  type="checkbox"
-                  label={track.label}
-                  checked={playlist.includes(track.value)}
-                  onChange={() => togglePlaylistTrack(track.value)}
-                />
-              ))}
+              <Form.Label>Available Tracks</Form.Label>
+              <ListGroup className="mb-2">
+                {TRACKS.filter((track) => !playlist.includes(track.value)).map((track) => (
+                  <ListGroup.Item
+                    key={track.value}
+                    action
+                    onClick={() => togglePlaylistTrack(track.value)}
+                  >
+                    {track.label}
+                  </ListGroup.Item>
+                ))}
+                {TRACKS.every((track) => playlist.includes(track.value)) && (
+                <ListGroup.Item className="text-muted">
+                  All tracks are in your playlist.
+                </ListGroup.Item>
+                )}
+              </ListGroup>
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                disabled={playlist.length === TRACKS.length}
+                onClick={addAllTracks}
+              >
+                Add All
+              </Button>
             </Form.Group>
 
             {playlist.length > 0 && (
@@ -227,6 +255,9 @@ function ShowcaseSetup() {
                     );
                   })}
                 </ListGroup>
+                <Button variant="outline-danger" size="sm" className="mt-2" onClick={clearPlaylist}>
+                  Remove All
+                </Button>
               </Form.Group>
             )}
 
