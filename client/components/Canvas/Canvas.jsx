@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import DrawingList from './DrawingList';
 
 function Canvas() {
   const paintCanvasRef = useRef(null);
@@ -238,6 +239,11 @@ function Canvas() {
           <option value={d.id} key={d.id}>{d.title}</option>
         ))}
       </Form.Select>
+      <DrawingList
+        drawings={drawings}
+        currentDrawing={currentDrawing}
+        loadDrawing={loadDrawing}
+      />
     </div>
   );
 }
