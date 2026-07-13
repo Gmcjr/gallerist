@@ -16,6 +16,8 @@ function CommentsView({
       <Modal
         show={showComments}
         onHide={() => setShowComments(false)}
+        // style={{ 'max-width': '800px' }}
+        contentClassName="comments-modal"
       >
         <Modal.Header closeButton>
           <Modal.Title>
@@ -24,7 +26,7 @@ function CommentsView({
         </Modal.Header>
         <Modal.Body>
           <Image
-            style={{ width: '125%', height: 'auto', display: 'inline-block' }}
+            style={{ width: '90%', height: 'auto', display: 'inline-block' }}
             src={image.imageUrl}
             id={image._id}
             alt={image.title}

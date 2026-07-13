@@ -4,6 +4,16 @@ import axios from 'axios';
 function CommentItem({ comment, retrieveComments }) {
   const [newComment, setNewComment] = useState({ body: comment.body });
   const [isEditing, setIsEditing] = useState(false);
+  const [userId, setUserId] = useState('');
+
+  if (!userId) {
+    axios
+      .get('/db/user')
+      .then(({ data: user }) => setUserId(user._id.toString()))
+      .catch((err) => {
+        console.error('Failed to GET user (how???):', err);
+      });
+  }
 
   const date = new Date(comment.createdAt).toLocaleString('en-US');
 
@@ -56,25 +66,33 @@ function CommentItem({ comment, retrieveComments }) {
             : null
         }
       </p>
-      <button type="button" onClick={deleteComment}>Delete</button>
       {
-        isEditing
+        comment.user?._id.toString() === userId
           ? (
-            <button
-              type="button"
-              onClick={updateComment}
-            >
-              Save Changes
-            </button>
+            <span>
+              <button type="button" onClick={deleteComment}>Delete</button>
+              {
+                isEditing
+                  ? (
+                    <button
+                      type="button"
+                      onClick={updateComment}
+                    >
+                      Save Changes
+                    </button>
+                  )
+                  : (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      Edit
+                    </button>
+                  )
+              }
+            </span>
           )
-          : (
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit
-            </button>
-          )
+          : null
       }
     </div>
   );

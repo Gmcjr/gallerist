@@ -10,12 +10,25 @@ import Modal from 'react-bootstrap/Modal';
 import WatchItem from './Watch';
 
 import LikeButtons from './social/LikeButtons';
+import CommentsView from './social/comments/CommentsView';
 
 function GalleryListItem({ image, users, getAllImages }) {
   // set up modal for friend request
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState([]);
+
+  const retrieveComments = () => {
+    axios
+      .get(`/social/comments/art/${image._id}`)
+      .then(({ data }) => setComments(data))
+      .catch((err) => {
+        console.error('Failed to GET comments:', err);
+      });
+  };
 
   // add a friend to users friend array
   function addFriend(e) {
@@ -28,6 +41,7 @@ function GalleryListItem({ image, users, getAllImages }) {
       })
       .catch((err) => console.log(err, 'Friend not added'));
   }
+
   return (
     <Container fluid>
       <Row>
@@ -39,6 +53,10 @@ function GalleryListItem({ image, users, getAllImages }) {
               src={image.imageUrl}
               id={image._id}
               alt={image.title}
+              onClick={() => {
+                setShowComments(true);
+                retrieveComments();
+              }}
             />
             <br />
             <div className="gallery-title">
@@ -65,7 +83,7 @@ function GalleryListItem({ image, users, getAllImages }) {
           { image.likes }
           Dislikes:
           { image.dislikes }
-          <LikeButtons id={image.imageId} getAllImages={getAllImages} />
+          <LikeButtons id={image._id} getAllImages={getAllImages} />
           <br />
         </Col>
       </Row>
@@ -77,6 +95,13 @@ function GalleryListItem({ image, users, getAllImages }) {
           </Button>
         </Modal.Footer>
       </Modal>
+      <CommentsView
+        showComments={showComments}
+        setShowComments={setShowComments}
+        comments={comments}
+        retrieveComments={retrieveComments}
+        image={image}
+      />
     </Container>
 
   );
