@@ -18,7 +18,7 @@ import ShowcaseDetail from './Showcase/ShowcaseDetail';
 import ShowcaseSetup from './Showcase/ShowcaseSetup';
 import ArtHeist from './ArtHeist/ArtHeist';
 import CrackCode from './ArtHeist/CrackCode';
-import Canvas from './Canvas';
+import Canvas from './Canvas/Canvas';
 
 const App = createBrowserRouter([
   {
