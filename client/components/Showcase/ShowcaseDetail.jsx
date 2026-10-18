@@ -8,7 +8,7 @@ import Carousel from 'react-bootstrap/Carousel';
 import Button from 'react-bootstrap/Button';
 
 // eslint-disable-next-line import/no-unresolved
-import TRACKS from './tracks';
+import TRACKS from './Tracks';
 
 function ShowcaseDetail() {
   const { id } = useParams();

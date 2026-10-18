@@ -10,7 +10,7 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 
 // eslint-disable-next-line import/no-unresolved
-import TRACKS from './tracks';
+import TRACKS from './Tracks';
 
 function ShowcaseSetup() {
   const location = useLocation();
