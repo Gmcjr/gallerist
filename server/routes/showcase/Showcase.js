@@ -119,71 +119,43 @@ showcaseRouter.post('/create', (req, res) => {
     isDraft,
   } = req.body;
 
-  findConflictingArtIds(artPieces).then((conflicts) => {
-    if (conflicts.length) {
-      res.status(409).json({
-        error: 'Some art pieces are already in another showcase',
-        conflicts,
+  // One chain, one response: create only after the conflict check passes.
+  findConflictingArtIds(artPieces)
+    .then((conflicts) => {
+      if (conflicts.length) {
+        res.status(409).json({
+          error: 'Some art pieces are already in another showcase',
+          conflicts,
+        });
+        return null;
+      }
+
+      let effectiveStartDate = startDate;
+      let effectiveEndDate = endDate;
+      if (isDraft === false) {
+        effectiveStartDate = startDate || new Date();
+        effectiveEndDate = endDate
+          || new Date(new Date(effectiveStartDate).getTime() + ONE_WEEK_MS);
+      }
+
+      return Showcase.create({
+        curator: _id,
+        curatorName: name,
+        title,
+        description,
+        playlist,
+        shuffle,
+        artPieces,
+        startDate: effectiveStartDate,
+        endDate: effectiveEndDate,
+        auctionDate,
+        isDraft,
       });
-      return;
-    }
-
-    let effectiveStartDate = startDate;
-    let effectiveEndDate = endDate;
-    if (isDraft === false) {
-      effectiveStartDate = startDate || new Date();
-      effectiveEndDate = endDate
-        || new Date(new Date(effectiveStartDate).getTime() + ONE_WEEK_MS);
-    }
-
-    Showcase.create({
-      curator: _id,
-      curatorName: name,
-      title,
-      description,
-      playlist,
-      shuffle,
-      artPieces,
-      startDate: effectiveStartDate,
-      endDate: effectiveEndDate,
-      auctionDate,
-      isDraft,
     })
-      .then((newShowcase) => {
-        res.status(201).send(newShowcase);
-      })
-      .catch((err) => {
-        console.error(
-          'Showcase conflict check: Failed ',
-          err,
-        );
-        res.sendStatus(500);
-      });
-  });
-
-  let effectiveStartDate = startDate;
-  let effectiveEndDate = endDate;
-
-  if (isDraft === false) {
-    effectiveStartDate = startDate || new Date();
-    effectiveEndDate = endDate || new Date(new Date(effectiveStartDate).getTime() + ONE_WEEK_MS);
-  }
-
-  Showcase.create({
-    curator: _id,
-    curatorName: name,
-    title,
-    description,
-    playlist,
-    shuffle,
-    artPieces,
-    startDate: effectiveStartDate,
-    endDate: effectiveEndDate,
-    auctionDate,
-    isDraft,
-  })
     .then((newShowcase) => {
-      res.status(201).send(newShowcase);
+      if (newShowcase) {
+        res.status(201).send(newShowcase);
+      }
     })
     .catch((err) => {
       console.error('Showcase create: Failed ', err);
